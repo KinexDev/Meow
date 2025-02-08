@@ -13,4 +13,4 @@ comparisons (1 == 2 => false)
 unary operators (-10, not true -> false)
 
 # Planned
-I plan on making it a language similar to lua/javascript with type hinting
+I plan on making it a language similar to lua/javascript with type hinting (not enforced)
