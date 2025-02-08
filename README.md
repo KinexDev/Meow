@@ -3,7 +3,7 @@ Meow is a simple language (currently it isn't one) im making in C# as a side pro
 
 number (10 + 3 * 2 => 16), 
 boolean parsing (true or false => true) and 
-string parsing ("hello" + 10 => "hello10")
+string parsing ("hello" + 10 => "hello10"), if you have a string in your expression the result will be string always
 comparisons (1 == 2 => false)
 unary operators (-10)
 
