@@ -63,8 +63,8 @@ call(function() {
 returning a function
 ```luau
 returnFunction: function = function(): function {
-    return function() {
-        print("hello world!");
+	return function() {
+		print("hello world!");
     }
 }
 
@@ -76,11 +76,11 @@ current if functions (bound to change)
 ```luau
 if(true, 
 function() {
-    // true
-    print("condition was true!");
+	// true
+	print("condition was true!");
 }, function() {
-    // false
-    print("condition was falsee!");
+	// false
+	print("condition was falsee!");
 });
 ```
 
@@ -108,10 +108,10 @@ result: number = add(number(number1), number(number2));
 
 if(result > limit, 
 function() { // if
-    print("you won");
+	print("you won");
 }, 
 function() { // else
-    print("you lost.");
+	print("you lost.");
 });
 
 print("total sum you got was", result, "you got", result - limit, "greater than", limit);
