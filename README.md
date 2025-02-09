@@ -29,7 +29,7 @@ the language is a semicolon based language, i don't have any error checking for 
 it comes with some basic functions, `print`, `input`, `wait`, `int`, `number`, `string` and `type`
 
 # Planned
-I plan on making it a language similar to python, lua and javascript to create a scripting language.
+I plan on making it a language similar to python, lua and javascript with hints of miniscript to create a scripting language.
 Maybe i plan on generating bytecode in the distant future, but rn im walking through ASTs.
 
 # Why
