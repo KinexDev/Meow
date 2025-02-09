@@ -10,6 +10,7 @@ namespace MeowLang
     {
         public static object PrintMeow(object[] arguments, Script context)
         {
+            Console.Write("[MEOW] : ");
             foreach (var arg in arguments)
             {
                 Console.Write((arg is null ? "null" : arg.ToString()) + " ");
@@ -21,6 +22,7 @@ namespace MeowLang
 
         public static object InputMeow(object[] arguments, Script context)
         {
+            Console.Write("[MEOW] : ");
             if (arguments.Length > 0)
             {
                 if (arguments[0] is null)
@@ -177,9 +179,10 @@ namespace MeowLang
                 }
 
                 Console.WriteLine(e.Message);
-                Console.WriteLine(e.StackTrace);
+                Console.ReadKey();
             }
 
+            Console.ReadKey();
             return;
 
             while (true)
