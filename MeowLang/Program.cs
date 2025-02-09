@@ -8,15 +8,10 @@ class Program
 {
     public static object PrintMeow(object[] arguments)
     {
-        var concatenatedString = string.Empty;
         foreach (var arg in arguments)
         {
-            if (arg is null)
-                concatenatedString += "null" + " ";   
-            else
-                concatenatedString += arg + " ";
+            Console.Write((arg is null ? "null" : arg.ToString()) + " ");
         }
-        Console.Write(concatenatedString);
         return null;
     }
     
