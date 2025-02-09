@@ -4,7 +4,7 @@ Meow is a simple language im making in C# as a side project written completely f
 example script.
 
 ```luau
-add: function = function(a: number, b: number): number {
+add = function(a: number, b: number): number {
 	return a + b;
 }
 
@@ -50,7 +50,7 @@ betterPrint("Hello world!");
 
 calling an anonymous function
 ```luau
-call: function = function(func: function): void {
+call = function(func: function): void {
 	func();
 }
 
@@ -62,13 +62,13 @@ call(function() {
 
 returning a function
 ```luau
-returnFunction: function = function(): function {
+returnFunc = function(): function {
 	return function() {
 		print("hello world!");
     }
 }
 
-func: function = returnFunction();
+func: function = returnFunc();
 func();  // prints hello world!
 ```
 
@@ -93,7 +93,7 @@ print("hello", name);
 more complex programs that rely on type hinting everywhere.
 
 ```luau
-add: function = function(a: number, b: number): number {
+add = function(a: number, b: number): number {
 	return a + b;
 }
 
