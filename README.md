@@ -12,7 +12,7 @@ comparisons `1 == 2` -> `False`
 
 unary operators `-10`, `not true` -> `False`
 
-variables `x = 2` or with type hinting `x:number = 2` these are all currently global, there is no local variables yet. Currently the types are ignored so it doesn't throw an error if you do `x:asiduasiudn = 10`, this is an intentional design for the type hinting as it when parsing we do not know the types.
+variables `x = 2` or with type hinting `x:number = 2` these are all currently global, there is no local variables yet. Currently the types are ignored so it doesn't throw an error if you do `x:nonexistanttype = 10`, this is an intentional design for the type hinting as it when parsing we do not know the types.
 
 function calls `print("hello world!")` using delegate called `MeowDelegate` for interacting with C# side, supports arguments in the form of `object[]` and a return type in the form `object`
 
