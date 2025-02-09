@@ -20,7 +20,7 @@ variables are declared like `x = 2` or with type hinting `x:number = 2` these ar
 
 function calls via C# side `print("hello world!")` using delegate called `MeowFunction` for interacting with C# side, supports arguments in the form of `object[]`, it also has the script as context and a return type in the form `object`
 
-functions are declared as `variable = function() {}`, the functions are treated as first class citizens, so you can do stuff like
+functions are declared as `variable = function() {}`, the functions are treated as first class citizens.
 
 The if statement currently is a function that takes in the condition, a true anonymous function and a false (i haven't gotten to writing if statements yet)
 
