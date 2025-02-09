@@ -57,6 +57,7 @@ func = returnFunction();
 func();  // prints hello world!
 ```
 
+current if functions (bound to change)
 ```luau
 if(true, 
 function() {
