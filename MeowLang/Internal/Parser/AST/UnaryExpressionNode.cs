@@ -11,7 +11,7 @@ public class UnaryExpressionNode : AstNode
         Operand = operand;
     }
     
-    public override object Visit()
+    public override object Visit(Script context)
     {
         switch (Expression)
         {
@@ -21,7 +21,7 @@ public class UnaryExpressionNode : AstNode
                     return !booleanNode.Boolean;
                 } else if (Operand is BinaryExpressionNode binaryExpressionNode)
                 {
-                    var returnNode = binaryExpressionNode.Visit();
+                    var returnNode = binaryExpressionNode.Visit(context);
                     if (returnNode is bool boolean)
                     {
                         return !boolean;
@@ -29,7 +29,7 @@ public class UnaryExpressionNode : AstNode
                 }
                 else if (Operand is UnaryExpressionNode unaryExpressionNode)
                 {
-                    return !(bool)unaryExpressionNode.Visit();
+                    return !(bool)unaryExpressionNode.Visit(context);
                 }       
                 break;
             case "-":
@@ -38,7 +38,7 @@ public class UnaryExpressionNode : AstNode
                     return -numberNode.Literal;
                 } else if (Operand is BinaryExpressionNode binaryExpressionNode)
                 {
-                    var returnNode = binaryExpressionNode.Visit();
+                    var returnNode = binaryExpressionNode.Visit(context);
                     if (returnNode is float number)
                     {
                         return -number;
@@ -46,8 +46,25 @@ public class UnaryExpressionNode : AstNode
                 }
                 else if (Operand is UnaryExpressionNode unaryExpressionNode)
                 {
-                    return -(float)unaryExpressionNode.Visit();
-                }       
+                    return -(float)unaryExpressionNode.Visit(context);
+                } else if (Operand is GetVariableNode variableNode)
+                {
+                    var result = variableNode.Visit(context);
+
+                    if (result is int)
+                    {
+                        return -(double)(int)result;
+                    }
+                    else if (result is float)
+                    {
+                        return -(float)result;
+                    }
+                    else if (result is double)
+                    {
+                        return -(double)result;
+                    }
+
+                }
                 break;
         }
         

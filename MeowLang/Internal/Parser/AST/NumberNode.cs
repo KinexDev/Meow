@@ -9,7 +9,7 @@ public class NumberNode : AstNode
         Literal = literal;
     }
 
-    public override object Visit()
+    public override object Visit(Script context)
     {
         return Literal;
     }

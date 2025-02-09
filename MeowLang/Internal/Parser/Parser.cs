@@ -24,12 +24,9 @@ namespace MeowLang.Internal.Parser
         public enum DispatchType
         {
             Brackets,
-            Unary
-        }
-        
-        public static object Evaluate(AstNode node)
-        {
-            return node.Visit();
+            Unary,
+            FunctionCall,
+            VariableDeclaration
         }
         
         public static ProgramAST Parse(Token[] tokens)
@@ -45,29 +42,9 @@ namespace MeowLang.Internal.Parser
                 switch (tokens[i].TokenType)
                 {
                     case TokenType.Number:
-                        if (dispatch.Count > 0)
-                        {
-                            var previousDispatchData = dispatch[^1];
-
-                            if (previousDispatchData.type == DispatchType.Unary)
-                            {
-                                if (nodeCurrentlyIn is UnaryExpressionNode node)
-                                {
-                                    node.Operand =
-                                        new NumberNode(float.Parse(tokens[i].Value));   
-                                    
-                                    nodeCurrentlyIn = previousDispatchData.value;
-
-                                    ParseType(node, ref nodeCurrentlyIn);
-                                
-                                    dispatch.RemoveAt(dispatch.Count - 1);
-                                    continue;
-                                }
-                            }
-                        }
-
-                        
                         NumberNode numberNode = new NumberNode(float.Parse(tokens[i].Value));
+                        if (CollectMinusUnary(tokens, numberNode, i, ref nodeCurrentlyIn, ref dispatch))
+                            continue;
                         ParseType(numberNode, ref nodeCurrentlyIn);
                         break;
                     case TokenType.String:
@@ -89,11 +66,13 @@ namespace MeowLang.Internal.Parser
                             }
                             if (tokens[i].Value == "-")
                             {
-                                if (i == 0 || (tokens[i - 1].TokenType != TokenType.Number && tokens[i - 1].Value != ")"))
+                                if (i == 0 || (tokens[i - 1].TokenType != TokenType.Number && tokens[i - 1].TokenType != TokenType.Identifier && tokens[i - 1].Value != ")"))
                                 {
                                     var nextToken = tokens[i + 1];
                                     ParseUnaryOperator(nextToken, tokens[i],
-                                        nextToken.TokenType != TokenType.Bracket && nextToken.TokenType != TokenType.Number, ref nodeCurrentlyIn, ref dispatch);   
+                                        nextToken.TokenType != TokenType.Bracket && 
+                                        nextToken.TokenType != TokenType.Number && 
+                                        nextToken.TokenType != TokenType.Identifier, ref nodeCurrentlyIn, ref dispatch);   
                                     continue;
                                 }
                             }
@@ -115,6 +94,10 @@ namespace MeowLang.Internal.Parser
                             } else if (tokens[i + 1].TokenType == TokenType.String)
                             {
                                 StringNode nextNum = new StringNode(tokens[i + 1].Value);
+                                ParseOperatorPrecedence(tokens[i], nextNum, ref nodeCurrentlyIn, ref i);
+                            } else if (tokens[i + 1].TokenType == TokenType.Identifier)
+                            {
+                                GetVariableNode nextNum = new GetVariableNode(tokens[i + 1].Value);
                                 ParseOperatorPrecedence(tokens[i], nextNum, ref nodeCurrentlyIn, ref i);
                             }
                             else
@@ -165,12 +148,25 @@ namespace MeowLang.Internal.Parser
                                 {
                                     bebracketNode.InBracket = true;
                                 }
-                                
-                                nodeCurrentlyIn = dispatch[^1].value;
+                                if (dispatch[^1].value is VariableDeclarationNode varNode)
+                                {
+                                    varNode.Value = nodeCurrentlyIn;
+                                    nodeCurrentlyIn = varNode;
+                                    dispatch.RemoveAt(dispatch.Count - 1);
+                                }
+                                else
+                                {
+                                    nodeCurrentlyIn = dispatch[^1].value;
+                                }
                                 
                                 ParseBrackets(bracketNode, ref nodeCurrentlyIn, ref dispatch);
                                 dispatch.RemoveAt(dispatch.Count - 1);
-
+                            } else if (dispatch[^1].type == DispatchType.FunctionCall)
+                            {
+                                var functionCallNode = (FunctionCallNode)dispatch[^1].value;
+                                functionCallNode.Arguments.Add(nodeCurrentlyIn);
+                                nodeCurrentlyIn = dispatch[^1].value;
+                                dispatch.RemoveAt(dispatch.Count - 1);
                             }
                             else
                                 throw new InterpreterException(tokens[i + 1].Line, "Expected a ')' after the bracket in line.");
@@ -207,8 +203,65 @@ namespace MeowLang.Internal.Parser
                             BooleanNode booleanNode = new BooleanNode(bool.Parse(tokens[i].Value));
                             ParseType(booleanNode, ref nodeCurrentlyIn);
                         }
+
+                        if (tokens[i].Value == "null")
+                        {
+                            NullNode nullNode = new NullNode();
+                            ParseType(nullNode, ref nodeCurrentlyIn);
+                        }
                         break;
-                    case TokenType.Terminator:
+                    case TokenType.Identifier:
+                        var additional = SkipIfTypeHinting(tokens, ref i);
+                        
+                        if (tokens[i + 1].TokenType == TokenType.Bracket && tokens[i + 1].Value == "(")
+                        {
+                            if (nodeCurrentlyIn is FunctionCallNode)
+                                throw new InterpreterException(tokens[i].Line, "semicolon is required.");
+                            nodeCurrentlyIn = new FunctionCallNode(tokens[i].Value);
+                            dispatch.Add(new DispatchData(DispatchType.FunctionCall, tokens[i], nodeCurrentlyIn));
+                            nodeCurrentlyIn = new AstNode();
+                            i++;
+                        } else if ((tokens[i + 1].TokenType == TokenType.Operator && tokens[i + 1].Value == "=") || (tokens[i + 1].Value == ":"))
+                        {
+                            nodeCurrentlyIn = new VariableDeclarationNode(tokens[i].Value);
+                            dispatch.Add(new DispatchData(DispatchType.VariableDeclaration, tokens[i], nodeCurrentlyIn));
+                            i += additional;
+                        }
+                        else
+                        {
+                            GetVariableNode variable = new GetVariableNode(tokens[i].Value);
+                            if (CollectMinusUnary(tokens, variable, i, ref nodeCurrentlyIn, ref dispatch))
+                                continue;
+                            ParseType(variable, ref nodeCurrentlyIn);
+                        }
+                        break;
+                    case TokenType.Punctuation:
+                        if (dispatch.Count > 0)
+                        {
+                            var previousDispatchData = dispatch[^1];
+                            if (previousDispatchData.type == DispatchType.FunctionCall)
+                            {
+                                //we are done with variable declaration now!
+                                var functionCallNode = (FunctionCallNode)previousDispatchData.value;
+                                functionCallNode.Arguments.Add(nodeCurrentlyIn);
+                                nodeCurrentlyIn = new AstNode();
+                            }
+                        }
+                        break;
+                    case TokenType.Terminator or TokenType.Eol:
+                        if (dispatch.Count > 0)
+                        {
+                            var previousDispatchData = dispatch[^1];
+                            if (previousDispatchData.type == DispatchType.VariableDeclaration)
+                            {
+                                //we are done with variable declaration now!
+                                var declarationNode = (VariableDeclarationNode)previousDispatchData.value;
+                                declarationNode.Value = nodeCurrentlyIn;
+                                nodeCurrentlyIn = declarationNode;
+                                dispatch.RemoveAt(dispatch.Count - 1);
+                            }
+                        }
+
                         program.Statements.Add(nodeCurrentlyIn);
                         nodeCurrentlyIn = new AstNode();
                         break;
@@ -222,6 +275,46 @@ namespace MeowLang.Internal.Parser
             return program;
         }
 
+        private static bool CollectMinusUnary(Token[] tokens, AstNode passingIn, int i, ref AstNode nodeCurrentlyIn, ref List<DispatchData> dispatch)
+        {
+            if (dispatch.Count > 0)
+            {
+                var previousDispatchData = dispatch[^1];
+
+                if (previousDispatchData.type == DispatchType.Unary)
+                {
+                    if (nodeCurrentlyIn is UnaryExpressionNode node)
+                    {
+                        node.Operand = passingIn;   
+                                    
+                        nodeCurrentlyIn = previousDispatchData.value;
+
+                        ParseType(node, ref nodeCurrentlyIn);
+                                
+                        dispatch.RemoveAt(dispatch.Count - 1);
+
+                        return true;
+                    }
+                }
+            }
+
+            return false;
+        }
+        
+        private static int SkipIfTypeHinting(Token[] tokens, ref int i)
+        {
+            if (tokens[i + 1].TokenType == TokenType.Punctuation && tokens[i + 1].Value == ":")
+            {
+                if (tokens[i + 2].TokenType != TokenType.Identifier && tokens[i + 2].TokenType != TokenType.Keyword)
+                {
+                    throw new InterpreterException(tokens[i + 2].Line, "Invalid type.");
+                }
+
+                return 3;
+            }
+
+            return 1;
+        }
         
         private static void ParseType(AstNode nodeType, ref AstNode nodeCurrentlyIn)
         {

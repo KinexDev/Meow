@@ -9,7 +9,7 @@ public class StringNode : AstNode
         String = str;
     }
 
-    public override object Visit()
+    public override object Visit(Script context)
     {
         return String;
     }

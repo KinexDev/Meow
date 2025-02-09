@@ -14,10 +14,10 @@ public class BinaryExpressionNode : AstNode
         Right = right;
     }
 
-    public override object Visit()
+    public override object Visit(Script context)
     {
-        object leftValue = Left.Visit();
-        object rightValue = Right.Visit();
+        object leftValue = Left.Visit(context);
+        object rightValue = Right.Visit(context);
 
         if (leftValue is NullNode)
         {
@@ -35,14 +35,11 @@ public class BinaryExpressionNode : AstNode
             {
                 return EvaluateBools(Expression, boolLVar, boolRVar);
             }
+            else
+            {
+                return EvaluateTypes(Expression, leftValue, rightValue);
+            }
         }
-
-        throw new InvalidOperationException($"Unsupported expression: {leftValue} {Expression} {rightValue}");
-    }
-    
-    public override string ToString()
-    {
-        return base.ToString()+ $" ({Left.ToString()} {Expression} {Right.ToString()})";
     }
 
     private object EvaluateNumber(string expression, float lvar, float rvar)
@@ -108,5 +105,18 @@ public class BinaryExpressionNode : AstNode
             default:
                 throw new InvalidOperationException($"Unsupported operator: {expression}");
         }   
+    }
+
+    private object EvaluateTypes(string expression, object lvar, object rvar)
+    {
+        switch (expression)
+        {
+            case "==":
+                return lvar == rvar;
+            case "!=":
+                return lvar != rvar;
+            default:
+                throw new InvalidOperationException($"Unsupported operator: {expression}");
+        }  
     }
 }

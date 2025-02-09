@@ -13,16 +13,15 @@ public static class Tokenizer
 
         // i used chatgpt to make the regex for this lol
         string pattern = @"(?<Number>\d+(\.\d+)?)" +
+                         @"|(?<EOL>(\r?\n))" +
                          @"|(?<Comment>//.*?(?:\r?\n|$))" +
-                         @"|(?<Operator>[+\-*|/]|and|or|not|==|!=|<=|>=|<|>|\.\.)" + 
-                         @"|(?<Keyword>var|if|function|while|null|true|false)" +
+                         @"|(?<Operator>\b(and|or|not)\b|==|!=|<=|>=|\+=|-=|\*=|/=|=|[+\-*/|])" +
+                         @"|(?<Keyword>\b(if|function|while|null|true|false)\b)" +
                          @"|(?<Bracket>[()])" +
                          @"|(?<Terminator>[;])" +
                          @"|(?<Punctuation>[{}.,:])" +
                          @"|(?<Identifier>[a-zA-Z_]\w*)" +
-                         @"|(?<String>""[^""]*"")" +
-                         @"|(?<EOL>\n)";
-
+                         @"|(?<String>""[^""]*"")";
         
         int lineNum = 0;
         

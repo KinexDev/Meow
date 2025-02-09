@@ -9,7 +9,7 @@ public class BooleanNode : AstNode
         Boolean = boolean;
     }
 
-    public override object Visit()
+    public override object Visit(Script context)
     {
         return Boolean;
     }
