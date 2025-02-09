@@ -13,6 +13,20 @@ result: number = add(5, 3);
 print(result); // 8
 ```
 
+without type hinting
+
+```luau
+add = function(a, b) {
+	return a + b;
+}
+
+result = add(5, 3);
+
+print(result); // 8
+```
+
+this code executes the same as previous one
+
 # Syntax
 the language is a semicolon based language, i have some error checking for semicolons so if you don't include them you may start getting logic errors.
 
@@ -36,24 +50,25 @@ betterPrint("Hello world!");
 
 calling an anonymous function
 ```luau
-call = function(func: function): void {
+call: function = function(func: function): void {
 	func();
 }
 
+// calls the anonymous function, output "Hello world!"
 call(function() {
 	print("hello world!");
-}); // prints hello world!
+});
 ```
 
 returning a function
 ```luau
-returnFunction = function(): function {
+returnFunction: function = function(): function {
     return function() {
         print("hello world!");
     }
 }
 
-func = returnFunction();
+func: function = returnFunction();
 func();  // prints hello world!
 ```
 
@@ -62,14 +77,16 @@ current if functions (bound to change)
 if(true, 
 function() {
     // true
+    print("condition was true!");
 }, function() {
     // false
+    print("condition was falsee!");
 });
 ```
 
 this is an example script using some of the basic functions.
 ```luau
-name = input("What is your name? ");
+name: string = input("What is your name? ");
 print("hello", name);
 ```
 
