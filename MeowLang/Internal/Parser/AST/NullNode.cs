@@ -1,9 +1,10 @@
-﻿namespace MeowLang.Internal.Parser.AST;
-
-public class NullNode : AstNode
+﻿namespace MeowLang.Internal.Parser.AST
 {
-    public override object Visit(Script context)
+    public class NullNode : AstNode
     {
-        return null;
+        public override object Visit(Script context)
+        {
+            return null;
+        }
     }
 }

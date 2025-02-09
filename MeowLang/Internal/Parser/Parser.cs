@@ -45,11 +45,11 @@ namespace MeowLang.Internal.Parser
                         NumberNode numberNode = new NumberNode(float.Parse(tokens[i].Value));
                         if (CollectMinusUnary(tokens, numberNode, i, ref nodeCurrentlyIn, ref dispatch))
                             continue;
-                        ParseType(numberNode, ref nodeCurrentlyIn);
+                        ParseType(tokens[i], numberNode, ref nodeCurrentlyIn);
                         break;
                     case TokenType.String:
                         StringNode stringNode = new StringNode(tokens[i].Value);
-                        ParseType(stringNode, ref nodeCurrentlyIn);
+                        ParseType(tokens[i], stringNode, ref nodeCurrentlyIn);
                         break;
                     case TokenType.Operator:
                         if (i + 1 < tokens.Length)
@@ -191,7 +191,7 @@ namespace MeowLang.Internal.Parser
                                 
                                 nodeCurrentlyIn = previousDispatchData.value;
 
-                                ParseType(node, ref nodeCurrentlyIn);
+                                ParseType(tokens[i], node, ref nodeCurrentlyIn);
                                 
                                 dispatch.RemoveAt(dispatch.Count - 1);
                                 continue;
@@ -201,13 +201,13 @@ namespace MeowLang.Internal.Parser
                         if (tokens[i].Value == "false" || tokens[i].Value == "true")
                         {
                             BooleanNode booleanNode = new BooleanNode(bool.Parse(tokens[i].Value));
-                            ParseType(booleanNode, ref nodeCurrentlyIn);
+                            ParseType(tokens[i], booleanNode, ref nodeCurrentlyIn);
                         }
 
                         if (tokens[i].Value == "null")
                         {
                             NullNode nullNode = new NullNode();
-                            ParseType(nullNode, ref nodeCurrentlyIn);
+                            ParseType(tokens[i], nullNode, ref nodeCurrentlyIn);
                         }
                         break;
                     case TokenType.Identifier:
@@ -216,23 +216,32 @@ namespace MeowLang.Internal.Parser
                         if (tokens[i + 1].TokenType == TokenType.Bracket && tokens[i + 1].Value == "(")
                         {
                             if (nodeCurrentlyIn is FunctionCallNode)
-                                throw new InterpreterException(tokens[i].Line, "semicolon is required.");
+                                throw new InterpreterException(tokens[i].Line, $"Expected semicolon at the end of '{tokens[i].Value}' function");
                             nodeCurrentlyIn = new FunctionCallNode(tokens[i].Value);
                             dispatch.Add(new DispatchData(DispatchType.FunctionCall, tokens[i], nodeCurrentlyIn));
                             nodeCurrentlyIn = new AstNode();
                             i++;
                         } else if ((tokens[i + 1].TokenType == TokenType.Operator && tokens[i + 1].Value == "=") || (tokens[i + 1].Value == ":"))
                         {
+                            if (dispatch.Count > 0)
+                            {
+                                var previousDispatchData = dispatch[^1];
+
+                                if (previousDispatchData.type == DispatchType.VariableDeclaration)
+                                    throw new InterpreterException(tokens[i].Line, $"Expected semicolon at the end of '{tokens[i - 1].Value}'");
+                            }
+
                             nodeCurrentlyIn = new VariableDeclarationNode(tokens[i].Value);
                             dispatch.Add(new DispatchData(DispatchType.VariableDeclaration, tokens[i], nodeCurrentlyIn));
                             i += additional;
+                            nodeCurrentlyIn = new AstNode();
                         }
                         else
                         {
                             GetVariableNode variable = new GetVariableNode(tokens[i].Value);
                             if (CollectMinusUnary(tokens, variable, i, ref nodeCurrentlyIn, ref dispatch))
                                 continue;
-                            ParseType(variable, ref nodeCurrentlyIn);
+                            ParseType(tokens[i], variable, ref nodeCurrentlyIn);
                         }
                         break;
                     case TokenType.Punctuation:
@@ -248,7 +257,7 @@ namespace MeowLang.Internal.Parser
                             }
                         }
                         break;
-                    case TokenType.Terminator or TokenType.Eol:
+                    case TokenType.Terminator:
                         if (dispatch.Count > 0)
                         {
                             var previousDispatchData = dispatch[^1];
@@ -266,6 +275,11 @@ namespace MeowLang.Internal.Parser
                         nodeCurrentlyIn = new AstNode();
                         break;
                 }
+            }
+
+            if (nodeCurrentlyIn is AstNode && tokens[^2].TokenType != TokenType.Terminator)
+            {
+                throw new InterpreterException(tokens[^2].Line, $"Expected semicolon at the end of '{tokens[^2].Value}'");
             }
 
             if (dispatch.Count != 0)
@@ -289,7 +303,7 @@ namespace MeowLang.Internal.Parser
                                     
                         nodeCurrentlyIn = previousDispatchData.value;
 
-                        ParseType(node, ref nodeCurrentlyIn);
+                        ParseType(tokens[i], node, ref nodeCurrentlyIn);
                                 
                         dispatch.RemoveAt(dispatch.Count - 1);
 
@@ -316,16 +330,18 @@ namespace MeowLang.Internal.Parser
             return 1;
         }
         
-        private static void ParseType(AstNode nodeType, ref AstNode nodeCurrentlyIn)
+        private static void ParseType(Token token, AstNode nodeType, ref AstNode nodeCurrentlyIn)
         {
             if (nodeCurrentlyIn is BinaryExpressionNode binaryNode)
             {
                 binaryNode.Right = nodeType;
+                return;
             }
-            else
-            {
-                nodeCurrentlyIn = nodeType;
-            }
+            
+            if (nodeCurrentlyIn.GetType() != typeof(AstNode))
+                throw new InterpreterException(token.Line, $"Starting a new expression before ending previous one? near {token.Value}");
+            
+            nodeCurrentlyIn = nodeType;
         }
 
         private static void ParseUnaryOperator(Token nextToken, Token currentToken, bool check, ref AstNode nodeCurrentlyIn, ref List<DispatchData> dispatch)

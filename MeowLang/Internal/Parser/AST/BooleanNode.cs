@@ -1,16 +1,17 @@
-﻿namespace MeowLang.Internal.Parser.AST;
-
-public class BooleanNode : AstNode
+﻿namespace MeowLang.Internal.Parser.AST
 {
-    public bool Boolean { get; set; }
-
-    public BooleanNode(bool boolean)
+    public class BooleanNode : AstNode
     {
-        Boolean = boolean;
-    }
+        public bool Boolean { get; set; }
 
-    public override object Visit(Script context)
-    {
-        return Boolean;
+        public BooleanNode(bool boolean)
+        {
+            Boolean = boolean;
+        }
+
+        public override object Visit(Script context)
+        {
+            return Boolean;
+        }
     }
 }

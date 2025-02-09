@@ -1,24 +1,25 @@
-﻿namespace MeowLang.Internal.Parser.AST;
-
-public class VariableDeclarationNode : AstNode
+﻿namespace MeowLang.Internal.Parser.AST
 {
-    public string Identifier { get; set; }
-    public AstNode Value { get; set; }
-    
-    public VariableDeclarationNode(string identifier)
+    public class VariableDeclarationNode : AstNode
     {
-        Identifier = identifier;
-    }
-    
-    public VariableDeclarationNode(string identifier, AstNode value)
-    {
-        Identifier = identifier;
-        Value = value;
-    }
+        public string Identifier { get; set; }
+        public AstNode Value { get; set; }
 
-    public override object Visit(Script context)
-    {
-        context.SetGlobal(Identifier, Value.Visit(context));
-        return null;
+        public VariableDeclarationNode(string identifier)
+        {
+            Identifier = identifier;
+        }
+
+        public VariableDeclarationNode(string identifier, AstNode value)
+        {
+            Identifier = identifier;
+            Value = value;
+        }
+
+        public override object Visit(Script context)
+        {
+            context.SetGlobal(Identifier, Value.Visit(context));
+            return null;
+        }
     }
 }

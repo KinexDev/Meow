@@ -1,15 +1,19 @@
-﻿namespace MeowLang.Internal.Parser.AST;
+﻿using System.Collections.Generic;
 
-public class ProgramAST : AstNode
+namespace MeowLang.Internal.Parser.AST
 {
-    public List<AstNode> Statements = new List<AstNode>();
-
-    public override object Visit(Script context)
+    public class ProgramAST : AstNode
     {
-        foreach (var statement in Statements)
+        public List<AstNode> Statements = new List<AstNode>();
+
+        public override object Visit(Script context)
         {
-            statement.Visit(context);
+            foreach (var statement in Statements)
+            {
+                statement.Visit(context);
+            }
+
+            return null;
         }
-        return null;
     }
 }

@@ -1,16 +1,17 @@
-﻿namespace MeowLang.Internal.Parser.AST;
-
-public class StringNode : AstNode
+﻿namespace MeowLang.Internal.Parser.AST
 {
-    public string String { get; set; }
-
-    public StringNode(string str)
+    public class StringNode : AstNode
     {
-        String = str;
-    }
+        public string String { get; set; }
 
-    public override object Visit(Script context)
-    {
-        return String;
+        public StringNode(string str)
+        {
+            String = str;
+        }
+
+        public override object Visit(Script context)
+        {
+            return String;
+        }
     }
 }

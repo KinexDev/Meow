@@ -1,16 +1,17 @@
-﻿namespace MeowLang.Internal.Parser.AST;
-
-public class GetVariableNode : AstNode
+﻿namespace MeowLang.Internal.Parser.AST
 {
-    public string Identifier { get; set; }
-    
-    public GetVariableNode(string identifier)
+    public class GetVariableNode : AstNode
     {
-        Identifier = identifier;
-    }
-    
-    public override object Visit(Script context)
-    {
-        return context.GetGlobal(Identifier);
+        public string Identifier { get; set; }
+
+        public GetVariableNode(string identifier)
+        {
+            Identifier = identifier;
+        }
+
+        public override object Visit(Script context)
+        {
+            return context.GetGlobal(Identifier);
+        }
     }
 }

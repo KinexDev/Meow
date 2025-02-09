@@ -1,8 +1,17 @@
-﻿namespace MeowLang.Internal.Parser;
+﻿using System;
 
-public class InterpreterException(int line, string message) : Exception
+namespace MeowLang.Internal.Parser
 {
-    public int Line { get; } = line;
-    public string Message { get; } = message;
-    public string FullMessage => $"Line {Line}: {Message}";
+    public class InterpreterException : Exception
+    {
+        public int Line { get; }
+        public string Message { get; }
+        public string FullMessage => $"Line {Line}: {Message}";
+
+        public InterpreterException(int line, string message)
+        {
+            Line = line;
+            Message = message;
+        }
+    }
 }

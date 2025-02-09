@@ -1,9 +1,15 @@
-﻿namespace MeowLang.Internal.Parser.AST;
-
-public class AstNode
+﻿namespace MeowLang.Internal.Parser.AST
 {
-    public virtual object Visit(Script context)
+    public class AstNode
     {
-        return new NullNode();
+        public virtual object Visit(Script context)
+        {
+            return new NullNode();
+        }
+
+        public override string ToString()
+        {
+            return $"{GetType().Name.ToLower()} : {Visit(null)}";
+        }
     }
 }
