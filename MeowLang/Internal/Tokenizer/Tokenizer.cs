@@ -13,7 +13,7 @@
 
             // i used chatgpt to make the regex for this lol
             string pattern = @"(?<Number>\d+(\.\d+)?)" +
-                             @"|(?<EOL>(\r?\n))" +
+                             @"|(?<Eol>(\n))" +
                              @"|(?<Comment>//.*?(?:\r?\n|$))" +
                              @"|(?<Operator>\b(and|or|not)\b|==|!=|<=|>=|\+=|-=|\*=|/=|=|>|<|[+\-*/|])" +
                              @"|(?<Keyword>\b(function|while|null|return|true|false)\b)" +
