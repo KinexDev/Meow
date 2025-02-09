@@ -14,7 +14,7 @@ print(result); // 8
 ```
 
 # Syntax
-the language is a semicolon based language, i don't have any error checking for semicolons so if you don't include them you start gettting a bunch of logic errors.
+the language is a semicolon based language, i don't have any error checking for semicolons so if you don't include them you start gettting a bunch of logic errors but there is an error system in place to prevent most of that.
 
 variables are declared like `x = 2` or with type hinting `x:number = 2` these are all currently global, there is no local variables yet, the types are not enforced but are just there for clarity and documentation.
 
