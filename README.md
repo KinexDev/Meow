@@ -3,8 +3,8 @@ Meow is a simple language im making in C# as a side project written completely f
 
 example script.
 
-```ts
-add:function = function(a: number, b: number): number {
+```luau
+add: function = function(a: number, b: number): number {
 	return a + b;
 }
 
@@ -13,31 +13,29 @@ result: number = add(5, 3);
 print(result); // 8
 ```
 
-# Features currently
-number parsing `10 + 3 * 2` => 16
-
-boolean parsing `true or false` -> true
-
-string parsing `"hello" + 10` -> `"hello10"`, if you have a string in your expression the result will be string always
-
-comparisons `1 == 2` -> `False`
-
-unary operators `-10`, `not true` -> `False`
-
-variables `x = 2` or with type hinting `x:number = 2` these are all currently global, there is no local variables yet. Currently the types are ignored so it doesn't throw an error if you do `x:nonexistanttype = 10`, this is an intentional design for the type hinting as it when parsing we do not know the types.
-
-function calls `print("hello world!")` using delegate called `MeowFunction` for interacting with C# side, supports arguments in the form of `object[]`, it also has the script as context and a return type in the form `object`
-
+# Syntax
 the language is a semicolon based language, i don't have any error checking for semicolons so if you don't include them you start gettting a bunch of logic errors.
 
-functions, they are declared as `variable = function() {}`, the functions are treated as first class citizens, so you can do stuff like
+variables are declared like `x = 2` or with type hinting `x:number = 2` these are all currently global, there is no local variables yet, the types are not enforced but are just there for clarity and documentation.
 
-```ts
+function calls via C# side `print("hello world!")` using delegate called `MeowFunction` for interacting with C# side, supports arguments in the form of `object[]`, it also has the script as context and a return type in the form `object`
+
+functions are declared as `variable = function() {}`, the functions are treated as first class citizens, so you can do stuff like
+
+The if statement currently is a function that takes in the condition, a true anonymous function and a false (i haven't gotten to writing if statements yet)
+
+it comes with some basic functions, `print`, `input`, `wait`, `int`, `number`, `string`, `if` and `type`
+
+# Examples 
+
+setting a function as a variable and calling it
+```luau
 betterPrint: function = print;
 betterPrint("Hello world!");
 ```
 
-```ts
+calling an anonymous function
+```luau
 call = function(func: function): void {
 	func();
 }
@@ -47,7 +45,8 @@ call(function() {
 }); // prints hello world!
 ```
 
-```ts
+returning a function
+```luau
 returnFunction = function(): function {
     return function() {
         print("hello world!");
@@ -58,9 +57,7 @@ func = returnFunction();
 func();  // prints hello world!
 ```
 
-The if statement currently is a function that takes in the condition, a true anonymous function and a false (i haven't gotten to writing if statements yet)
-
-```ts
+```luau
 if(true, 
 function() {
     // true
@@ -69,18 +66,15 @@ function() {
 });
 ```
 
-it comes with some basic functions, `print`, `input`, `wait`, `int`, `number`, `string`, `if` and `type`
-
-
 this is an example script using some of the basic functions.
-```ts
+```luau
 name = input("What is your name? ");
 print("hello", name);
 ```
 
 more complex programs that rely on type hinting everywhere.
 
-```ts
+```luau
 add: function = function(a: number, b: number): number {
 	return a + b;
 }
