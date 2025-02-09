@@ -10,7 +10,12 @@ namespace MeowLang.Internal.Parser.AST
         {
             foreach (var statement in Statements)
             {
-                statement.Visit(context);
+                var result = statement.Visit(context);
+
+                if (result is ReturnNode returnNode)
+                {
+                    return returnNode.ReturnValue.Visit(context);
+                }
             }
 
             return null;

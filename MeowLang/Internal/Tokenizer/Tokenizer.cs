@@ -16,7 +16,7 @@
                              @"|(?<EOL>(\r?\n))" +
                              @"|(?<Comment>//.*?(?:\r?\n|$))" +
                              @"|(?<Operator>\b(and|or|not)\b|==|!=|<=|>=|\+=|-=|\*=|/=|=|>|<|[+\-*/|])" +
-                             @"|(?<Keyword>\b(if|function|while|null|true|false)\b)" +
+                             @"|(?<Keyword>\b(function|while|null|return|true|false)\b)" +
                              @"|(?<Bracket>[()])" +
                              @"|(?<Terminator>[;])" +
                              @"|(?<Punctuation>[{}.,:])" +

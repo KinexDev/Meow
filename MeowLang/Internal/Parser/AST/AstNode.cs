@@ -4,12 +4,12 @@
     {
         public virtual object Visit(Script context)
         {
-            return new NullNode();
+            return null;
         }
 
         public override string ToString()
         {
-            return $"{GetType().Name.ToLower()} : {Visit(null)}";
+            return $"{GetType().Name.ToLower()}";
         }
     }
 }

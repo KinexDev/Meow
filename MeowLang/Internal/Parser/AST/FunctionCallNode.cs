@@ -27,14 +27,14 @@ namespace MeowLang.Internal.Parser.AST
                 arguments.Add(argument.Visit(context));
             }
             
-            if (context.GetGlobal(Identifier) is MeowDelegate meowDelegate)
+            if (context.GetGlobal(Identifier) is MeowFunction meowDelegate)
             {
-                return meowDelegate.Invoke(arguments.ToArray());
-            } else if (context.GetGlobal(Identifier) is FunctionNode function)
+                return meowDelegate.Invoke(arguments.ToArray(), context);
+            } else if (context.GetGlobal(Identifier) is Function function)
             {
                 return function.Call(arguments.ToArray(), context);
-            }
-
+            } else
+                throw new InvalidOperationException("Unknown function call");
             return null;
         }
     }   

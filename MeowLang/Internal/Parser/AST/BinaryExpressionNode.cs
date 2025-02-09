@@ -20,7 +20,7 @@ namespace MeowLang.Internal.Parser.AST
         {
             object leftValue = Left.Visit(context);
             object rightValue = Right.Visit(context);
-
+            
             if (leftValue is NullNode)
             {
                 throw new InvalidOperationException("No left operand on binary expression found?");

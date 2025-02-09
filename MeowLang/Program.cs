@@ -8,7 +8,7 @@ namespace MeowLang
 {
     class Program
     {
-        public static object PrintMeow(object[] arguments)
+        public static object PrintMeow(object[] arguments, Script context)
         {
             foreach (var arg in arguments)
             {
@@ -19,7 +19,7 @@ namespace MeowLang
             return null;
         }
 
-        public static object InputMeow(object[] arguments)
+        public static object InputMeow(object[] arguments, Script context)
         {
             if (arguments.Length > 0)
             {
@@ -32,11 +32,11 @@ namespace MeowLang
             return Console.ReadLine();
         }
 
-        public static object WaitMeow(object[] arguments)
+        public static object WaitMeow(object[] arguments, Script context)
         {
             if (arguments.Length > 0)
             {
-                float time = (float)NumberMeow(new [] {arguments[0]});
+                float time = (float)NumberMeow(new [] {arguments[0]}, context);
                 time *= 1000;
                 Thread.Sleep((int)time);
             }
@@ -44,7 +44,7 @@ namespace MeowLang
             return null;
         }
 
-        public static object IntMeow(object[] arguments)
+        public static object IntMeow(object[] arguments, Script context)
         {
             if (arguments.Length > 0)
             {
@@ -71,7 +71,7 @@ namespace MeowLang
             return null;
         }
 
-        public static object NumberMeow(object[] arguments)
+        public static object NumberMeow(object[] arguments, Script context)
         {
             if (arguments.Length > 0)
             {
@@ -98,7 +98,7 @@ namespace MeowLang
             return null;
         }
 
-        public static object StringMeow(object[] arguments)
+        public static object StringMeow(object[] arguments, Script context)
         {
             if (arguments.Length > 0)
             {
@@ -108,7 +108,7 @@ namespace MeowLang
             return null;
         }
 
-        public static object TypeMeow(object[] arguments)
+        public static object TypeMeow(object[] arguments, Script context)
         {
             if (arguments.Length > 0)
             {
@@ -119,10 +119,25 @@ namespace MeowLang
 
                 if (type == "single")
                     return "number";
+                else if (type == "meowfunction")
+                    return "function";
 
                 return type;
             }
 
+            return null;
+        }
+
+        public static object IfMeow(object[] arguments, Script context)
+        {
+            if ((bool)arguments[0])
+            {
+                ((Function)arguments[1]).Call(new object[0], context);
+            }
+            else
+            {
+                ((Function)arguments[2]).Call(new object[0], context);
+            }
             return null;
         }
 
@@ -139,38 +154,33 @@ namespace MeowLang
 
             var script = new Script();
 
-            script.SetGlobal("print", (MeowDelegate)PrintMeow);
-            script.SetGlobal("input", (MeowDelegate)InputMeow);
-            script.SetGlobal("wait", (MeowDelegate)WaitMeow);
-            script.SetGlobal("int", (MeowDelegate)IntMeow);
-            script.SetGlobal("number", (MeowDelegate)NumberMeow);
-            script.SetGlobal("string", (MeowDelegate)StringMeow);
-            script.SetGlobal("type", (MeowDelegate)TypeMeow);
+            script.SetGlobal("print", (MeowFunction)PrintMeow);
+            script.SetGlobal("input", (MeowFunction)InputMeow);
+            script.SetGlobal("wait", (MeowFunction)WaitMeow);
+            script.SetGlobal("int", (MeowFunction)IntMeow);
+            script.SetGlobal("number", (MeowFunction)NumberMeow);
+            script.SetGlobal("string", (MeowFunction)StringMeow);
+            script.SetGlobal("type", (MeowFunction)TypeMeow);
+            script.SetGlobal("if", (MeowFunction)IfMeow);
 
-            if (disableRepl)
+            string? filePath = Directory.GetCurrentDirectory() + "/Script.meow";
+            try
             {
-                //string? filePath = Directory.GetCurrentDirectory() + "/Script.meow";
-                try
+                script.DoString(File.ReadAllText(filePath));
+            }
+            catch (Exception e)
+            {
+                if (e is InterpreterException interpreterException)
                 {
-                    string Source =
-                        @"name = input(""What is your name? "");
-                    print(""hello"", name);";
-                    script.DoString(Source);
-                    //script.DoString(File.ReadAllText(filePath));
+                    Console.WriteLine(interpreterException.FullMessage);
+                    return;
                 }
-                catch (Exception e)
-                {
-                    if (e is InterpreterException interpreterException)
-                    {
-                        Console.WriteLine(interpreterException.FullMessage);
-                    }
 
-                    Console.WriteLine(e.Message);
-                }
+                Console.WriteLine(e.Message);
+                Console.WriteLine(e.StackTrace);
             }
 
-            if (disableRepl)
-                return;
+            return;
 
             while (true)
             {
@@ -191,7 +201,7 @@ namespace MeowLang
                         continue;
                     }
 
-                    Console.WriteLine(e.Message);
+                    Console.WriteLine(e.Message + "\n" + e.StackTrace);
                 }
             }
         }

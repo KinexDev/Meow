@@ -37,10 +37,10 @@ namespace MeowLang.Internal.Parser
             program = Parser.Parse(tokenList);
         }
 
-        public void DoString(string script)
+        public object DoString(string script)
         {
             LoadString(script);
-            program.Visit(this);
+            return program.Visit(this);
         }
     }
 }
