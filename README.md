@@ -1,5 +1,5 @@
 # Meow
-Meow is a simple language im making in C# as a side project written completely from scratch, i use a regex lexer and then generate an AST which i then walk through for execution.
+Meow is a simple language im making in C# as a side project written completely from scratch, i use a regex lexer and then generate an AST which i then walk through for execution, you can download the [meow playground](https://github.com/KinexDev/Meow/releases/tag/binaries) here.
 
 example script.
 
