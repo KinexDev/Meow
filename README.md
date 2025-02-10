@@ -142,3 +142,5 @@ var script = new Script();
 script.SetGlobal("print", (MeowFunction)PrintMeow);
 script.DoString("print(\"Hello world!\");"); // prints `Hello world!` to the console.
 ```
+
+ making changes to this language is fairly easy at least for me, like for example if you wanted to make it more like lua you can get rid of the { } in functions and replace it in the end fairly easily.
