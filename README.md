@@ -104,7 +104,7 @@ limit: number = number(input("set the limit. "));
 number1: number = number(input("give me the first number. "));
 number2: number = number(input("give me the second number. "));
 
-result: number = add(number(number1), number(number2));
+result: number = add(number1, number2);
 
 if(result > limit, 
 function() { // if
