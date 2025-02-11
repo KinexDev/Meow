@@ -32,9 +32,9 @@ namespace MeowLang.Internal.Parser.AST
                 return meowDelegate.Invoke(arguments.ToArray(), context);
             } else if (context.GetGlobal(Identifier) is Function function)
             {
-                return function.Call(arguments.ToArray(), context);
+                return function.Call(context, arguments.ToArray());
             } else
-                throw new InvalidOperationException("Unknown function call");
+                throw new InvalidOperationException($"Unknown function call {Identifier}");
             return null;
         }
     }   

@@ -1,5 +1,5 @@
 # Meow
-Meow is a simple language im making in C# as a side project written completely from scratch, i use a regex lexer and then generate an AST which i then walk through for execution, you can download the [meow playground](https://github.com/KinexDev/Meow/releases/tag/binaries) here.
+Meow is a simple language im making in C# as a side project written completely from scratch, i use a regex lexer and then generate an AST which i then walk through for execution, you can download the [meow playground](https://github.com/KinexDev/Meow/releases/tag/0.0.2) here.
 
 example script.
 
@@ -13,7 +13,7 @@ result: number = add(5, 3);
 print(result); // 8
 ```
 
-without type hinting
+without type hinting (type hints are not enforced)
 
 ```luau
 add = function(a, b) {
@@ -23,6 +23,60 @@ add = function(a, b) {
 result = add(5, 3);
 
 print(result); // 8
+```
+
+Generated AST
+
+```json
+{
+  "Statements": [
+    {
+      "Identifier": "add",
+      "Value": {
+        "FunctionNodes": [
+          {
+            "ReturnValue": {
+              "Expression": "+",
+              "InBracket": false,
+              "Left": {
+                "Identifier": "a"
+              },
+              "Right": {
+                "Identifier": "b"
+              }
+            }
+          }
+        ],
+        "parameters": [
+          "a",
+          "b"
+        ]
+      }
+    },
+    {
+      "Identifier": "result",
+      "Value": {
+        "Identifier": "add",
+        "Arguments": [
+          {
+            "Literal": 5.0
+          },
+          {
+            "Literal": 3.0
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "print",
+      "Arguments": [
+        {
+          "Identifier": "result"
+        }
+      ]
+    }
+  ]
+}
 ```
 
 this code executes the same as previous one
@@ -36,9 +90,11 @@ function calls via C# side `print("hello world!")` using delegate called `MeowFu
 
 functions are declared as `variable = function() {}`, the functions are treated as first class citizens.
 
-The if statement currently is a function that takes in the condition, a true anonymous function and a false (i haven't gotten to writing if statements yet)
+The if-else statements and while statements work, you cannot chain elifs yet, there is no for statements yet but you could make that with a while loop and a variable.
 
 it comes with some basic functions, `print`, `input`, `wait`, `int`, `number`, `string`, `if` and `type`
+
+the `program` calls the function `update` every frame if it can find one. (this was for testing)
 
 # Examples 
 
@@ -54,7 +110,7 @@ call = function(func: function): void {
 	func();
 }
 
-// calls the anonymous function, output "Hello world!"
+// calls the anonymous function, prints hello world!
 call(function() {
 	print("hello world!");
 });
@@ -74,20 +130,48 @@ func();  // prints hello world!
 
 current if functions (bound to change)
 ```luau
-if(true, 
-function() {
-	// true
+if(true) {
 	print("condition was true!");
-}, function() {
-	// false
-	print("condition was falsee!");
-});
+} else {
+	print("condition was false!");
+}
 ```
 
 this is an example script using some of the basic functions.
 ```luau
 name: string = input("What is your name? ");
 print("hello", name);
+```
+
+the AST for this simple program.
+
+```json
+{
+  "Statements": [
+    {
+      "Identifier": "name",
+      "Value": {
+        "Identifier": "input",
+        "Arguments": [
+          {
+            "String": "What is your name? "
+          }
+        ]
+      }
+    },
+    {
+      "Identifier": "print",
+      "Arguments": [
+        {
+          "String": "hello"
+        },
+        {
+          "Identifier": "name"
+        }
+      ]
+    }
+  ]
+}
 ```
 
 more complex programs that rely on type hinting everywhere.
@@ -106,16 +190,48 @@ number2: number = number(input("give me the second number. "));
 
 result: number = add(number(number1), number(number2));
 
-if(result > limit, 
-function() { // if
+if(result > limit) {
 	print("you won");
-}, 
-function() { // else
+} else {
 	print("you lost.");
-});
+}
 
 print("total sum you got was", result, "you got", result - limit, "greater than", limit);
 ```
+
+simple program for showing if-elses and a while loop.
+```luau
+while (true) {
+	x = input("what do you want to try? true, false or exit? ");
+	if (x == "exit") {
+		// exits the program returns a value for c# runner, intended behaviour
+		return;
+	}
+	if (x == "true") {
+		print("got it true");
+	} else {
+		print("its false");
+	}
+}
+```
+
+a custom application that loops how many times the user inputted
+```lua
+forLoop = function(to: number, loop: function): void {
+	i = 0;
+	while (i < int(to)) {
+		loop(i);
+		i = i + 1;
+	}
+}
+
+howManyCount: string = input("how do you want it to count? ");
+
+forLoop(int(howManyCount), function(i: number) {
+	print(i + 1);
+});
+```
+
 
 # Planned
 I plan on making it a language similar to python, lua and javascript with hints of miniscript to create a scripting language.
@@ -140,5 +256,16 @@ public static object PrintMeow(object[] arguments)
 ...
 var script = new Script();
 script.SetGlobal("print", (MeowFunction)PrintMeow);
-script.DoString("print(\"Hello world!\");"); // prints `Hello world!` to the console.
+script.DoString("print(\"Hello world!\");"); // prints `Hello world!` to the console, do string returns what is returned from the script.
+```
+
+To call a function for example lets say on unity update, you can do the following after you've initalized the script.
+
+```cs
+var update = script.GetGlobal("update");
+
+if (update is Function func) // check if its a function
+{
+	func.Call(script); // you need to reference the script in the call.
+}           
 ```

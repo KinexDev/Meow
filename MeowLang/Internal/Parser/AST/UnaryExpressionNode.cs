@@ -34,7 +34,27 @@ namespace MeowLang.Internal.Parser.AST
                     {
                         return !(bool)unaryExpressionNode.Visit(context);
                     }
+                    else if (Operand is GetVariableNode variableNode)
+                    {
+                        var result = variableNode.Visit(context);
 
+                        if (result is bool res)
+                        {
+                            return !res;
+                        }
+                        else
+                            throw new Exception("variable didn't return a boolean!");
+                    } else if (Operand is FunctionCallNode functionCallNode)
+                    {
+                        var result = functionCallNode.Visit(context);
+
+                        if (result is bool res)
+                        {
+                            return !res;
+                        }
+                        else
+                            throw new Exception("function call didn't return a boolean!");
+                    }
                     break;
                 case "-":
                     if (Operand is NumberNode numberNode)
@@ -69,7 +89,26 @@ namespace MeowLang.Internal.Parser.AST
                         {
                             return -(double)result;
                         }
+                        else
+                            throw new Exception("variable didn't return a number!");
+                    } else if (Operand is FunctionCallNode functionCallNode)
+                    {
+                        var result = functionCallNode.Visit(context);
 
+                        if (result is int)
+                        {
+                            return -(double)(int)result;
+                        }
+                        else if (result is float)
+                        {
+                            return -(float)result;
+                        }
+                        else if (result is double)
+                        {
+                            return -(double)result;
+                        }
+                        else
+                            throw new Exception("function call didn't return a number!");
                     }
 
                     break;

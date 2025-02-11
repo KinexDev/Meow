@@ -16,14 +16,14 @@
                              @"|(?<Eol>(\n))" +
                              @"|(?<Comment>//.*?(?:\r?\n|$))" +
                              @"|(?<Operator>\b(and|or|not)\b|==|!=|<=|>=|\+=|-=|\*=|/=|=|>|<|[+\-*/|])" +
-                             @"|(?<Keyword>\b(function|while|null|return|true|false)\b)" +
+                             @"|(?<Keyword>\b(if|else|function|while|null|return|true|false)\b)" +
                              @"|(?<Bracket>[()])" +
                              @"|(?<Terminator>[;])" +
                              @"|(?<Punctuation>[{}.,:])" +
                              @"|(?<Identifier>[a-zA-Z_]\w*)" +
                              @"|(?<String>""[^""]*"")";
 
-            int lineNum = 0;
+            int lineNum = 1;
 
             foreach (Match match in Regex.Matches(code, pattern, RegexOptions.Singleline))
             {
@@ -38,8 +38,6 @@
                             if (tokenType == TokenType.Eol)
                             {
                                 lineNum++;
-                                tokenList.Add(new Token(
-                                    TokenType.Eol, (ushort)lineNum));
                                 break;
                             }
 
@@ -64,9 +62,6 @@
             }
 
             lineNum++;
-            tokenList.Add(new Token(
-                TokenType.Eol, (ushort)lineNum));
-
             tokens = tokenList.ToArray();
         }
     }

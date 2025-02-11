@@ -1,4 +1,5 @@
 ﻿using System;
+using System.Diagnostics;
 using System.Threading;
 using MeowLang.Internal.Parser;
 using MeowLang.Internal.Parser.AST;
@@ -129,31 +130,9 @@ namespace MeowLang
 
             return null;
         }
-
-        public static object IfMeow(object[] arguments, Script context)
-        {
-            if ((bool)arguments[0])
-            {
-                ((Function)arguments[1]).Call(new object[0], context);
-            }
-            else
-            {
-                ((Function)arguments[2]).Call(new object[0], context);
-            }
-            return null;
-        }
-
+        
         static void Main(string[] args)
         {
-            bool disableRepl = false;
-            //string? filePath = Directory.GetCurrentDirectory() + "/Test.meow";
-
-            //Tokenizer.FindTokens(File.ReadAllText(filePath), out Token[] tokenList);
-            //foreach (var token in tokenList)
-            //{
-            //    Console.WriteLine($"{token.TokenType} : {token.Value}");
-            //}
-
             var script = new Script();
 
             script.SetGlobal("print", (MeowFunction)PrintMeow);
@@ -163,50 +142,53 @@ namespace MeowLang
             script.SetGlobal("number", (MeowFunction)NumberMeow);
             script.SetGlobal("string", (MeowFunction)StringMeow);
             script.SetGlobal("type", (MeowFunction)TypeMeow);
-            script.SetGlobal("if", (MeowFunction)IfMeow);
-
-            string? filePath = Directory.GetCurrentDirectory() + "/Script.meow";
             try
             {
-                script.DoString(File.ReadAllText(filePath));
+                script.DoString(File.ReadAllText("Script.meow"));
             }
             catch (Exception e)
             {
                 if (e is InterpreterException interpreterException)
                 {
                     Console.WriteLine(interpreterException.FullMessage);
-                    return;
                 }
-
-                Console.WriteLine(e.Message);
+                else
+                {
+                    Console.WriteLine(e.Message);
+                }
+                
                 Console.ReadKey();
+                return;
             }
 
-            Console.ReadKey();
-            return;
-
-            while (true)
+            var update = script.GetGlobal("update");
+            
+            if (update is Function func)
             {
-                Console.Write($"> ");
-                string? Input = Console.ReadLine();
-
-                try
+                while (true)
                 {
-                    Console.Write($"-> ");
-                    script.DoString(Input);
-                    Console.Write("\n");
-                }
-                catch (Exception e)
-                {
-                    if (e is InterpreterException interpreterException)
+                    try
                     {
-                        Console.WriteLine(interpreterException.FullMessage);
-                        continue;
+                        func.Call(script);
                     }
-
-                    Console.WriteLine(e.Message + "\n" + e.StackTrace);
+                    catch (Exception e)
+                    {
+                        if (e is InterpreterException interpreterException)
+                        {
+                            Console.WriteLine(interpreterException.FullMessage);
+                        }
+                        else
+                        {
+                            Console.WriteLine(e.Message);
+                        }
+                
+                        Console.ReadKey();
+                        return;
+                    }
                 }
             }
+            
+            Console.ReadKey();
         }
     }
 }

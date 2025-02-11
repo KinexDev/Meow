@@ -12,7 +12,7 @@ namespace MeowLang.Internal.Parser.AST
             return this;
         }
 
-        public object Call(object[] args, Script context)
+        public object Call(Script context, params object[] args)
         {
             for (int i = 0; i < args.Length; i++)
             {
@@ -22,7 +22,6 @@ namespace MeowLang.Internal.Parser.AST
             
             foreach (var statement in FunctionNodes)
             {
-                
                 var result = statement.Visit(context);
 
                 if (result is ReturnNode returnNode)

@@ -1,7 +1,9 @@
 ﻿using System;
 using System.Collections.Generic;
+using System.Text.Json;
 using MeowLang.Internal.Parser.AST;
 using MeowLang.Internal.Tokenizer;
+using Newtonsoft.Json;
 
 namespace MeowLang.Internal.Parser
 {
@@ -35,6 +37,10 @@ namespace MeowLang.Internal.Parser
             }
 
             program = Parser.Parse(tokenList);
+            
+            string fileName = "ast.json"; 
+            string jsonString = JsonConvert.SerializeObject(program, Formatting.Indented);
+            File.WriteAllText(fileName, jsonString);
         }
 
         public object DoString(string script)
