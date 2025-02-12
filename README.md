@@ -3,7 +3,7 @@ Meow is a simple language im making in C# as a side project written completely f
 
 example script.
 
-```luau
+```ts
 add = function(a: number, b: number): number {
 	return a + b;
 }
@@ -15,7 +15,7 @@ print(result); // 8
 
 without type hinting (type hints are not enforced)
 
-```luau
+```ts
 add = function(a, b) {
 	return a + b;
 }
@@ -99,13 +99,13 @@ the `program` calls the function `update` every frame if it can find one. (this 
 # Examples 
 
 setting a function as a variable and calling it
-```luau
+```ts
 betterPrint: function = print;
 betterPrint("Hello world!");
 ```
 
 calling an anonymous function
-```luau
+```ts
 call = function(func: function): void {
 	func();
 }
@@ -117,7 +117,7 @@ call(function() {
 ```
 
 returning a function
-```luau
+```ts
 returnFunc = function(): function {
 	return function() {
 		print("hello world!");
@@ -129,7 +129,7 @@ func();  // prints hello world!
 ```
 
 current if functions (bound to change)
-```luau
+```ts
 if(true) {
 	print("condition was true!");
 } else {
@@ -138,7 +138,7 @@ if(true) {
 ```
 
 this is an example script using some of the basic functions.
-```luau
+```ts
 name: string = input("What is your name? ");
 print("hello", name);
 ```
@@ -176,7 +176,7 @@ the AST for this simple program.
 
 more complex programs that rely on type hinting everywhere.
 
-```luau
+```ts
 add = function(a: number, b: number): number {
 	return a + b;
 }
@@ -200,7 +200,7 @@ print("total sum you got was", result, "you got", result - limit, "greater than"
 ```
 
 simple program for showing if-elses and a while loop.
-```luau
+```ts
 while (true) {
 	x = input("what do you want to try? true, false or exit? ");
 	if (x == "exit") {
@@ -216,7 +216,7 @@ while (true) {
 ```
 
 a custom application that loops how many times the user inputted
-```luau
+```ts
 forLoop = function(to: number, loop: function): void {
 	i = 0;
 	while (i < int(to)) {
@@ -233,7 +233,7 @@ forLoop(int(howManyCount), function(i: number) {
 ```
 
 an actual game where you have to reach the end in the minimum amount of attempts, you play as a O
-```luau
+```ts
 // variables
 playerX: number = 0;
 playerY: number = 0;
