@@ -216,7 +216,7 @@ while (true) {
 ```
 
 a custom application that loops how many times the user inputted
-```lua
+```luau
 forLoop = function(to: number, loop: function): void {
 	i = 0;
 	while (i < int(to)) {
@@ -230,6 +230,106 @@ howManyCount: string = input("how do you want it to count? ");
 forLoop(int(howManyCount), function(i: number) {
 	print(i + 1);
 });
+```
+
+an actual game where you have to reach the end in the minimum amount of attempts, you play as a O
+```luau
+// variables
+playerX: number = 0;
+playerY: number = 0;
+
+gridSizeX: number = 10;
+gridSizeY: number = 20;
+
+goalPosX: number = gridSizeX - int(gridSizeX / 2);
+goalPosY: number = gridSizeY - int(gridSizeY / 2);
+
+attempts: number = (gridSizeX + gridSizeY) / 2;
+print("get to the middle! with only", attempts,"movements.");
+
+getInputs = function(): void {
+	move = input("where do you want to move? w = up, s = down, a = left and d = right. ");
+	if (move == "w") {
+		playerY = playerY - 1;
+		playerY = int(playerY);
+
+		if (playerY < 0) {
+			playerY = 0;
+		}
+		attempts = attempts - 1;
+	}
+	if (move == "s") {
+		playerY = playerY + 1;
+		playerY = int(playerY);
+
+		if (playerY > (gridSizeX - 1)) {
+			playerY = gridSizeX - 1;
+		}
+		attempts = attempts - 1;
+	}
+	if (move == "a") {
+		playerX = playerX - 1;
+		playerX = int(playerX);
+
+		if (playerX < 0) {
+			playerX = 0;
+		}
+		attempts = attempts - 1;
+	}
+	if (move == "d") {
+		playerX = playerX + 1;
+		playerX = int(playerX);
+
+		if (playerX > (gridSizeY - 1)) {
+			playerX = gridSizeY - 1;
+		}
+		attempts = attempts - 1;
+	}
+}
+
+drawBoard = function(): void {
+	x = 0;
+	while (x < int(gridSizeX)) {
+		concatenatedLine = "";
+		y = 0;
+		while (y < int(gridSizeY)) {
+			if (playerX == y and playerY == x) {
+				concatenatedLine = concatenatedLine + "O";
+			} else {
+				if (x == goalPosX and y == goalPosY) {
+					concatenatedLine = concatenatedLine + "&";
+				}else {
+					concatenatedLine = concatenatedLine + "'";
+				}
+			}
+
+			y = y + 1;
+			y = int(y);
+		}
+		print(concatenatedLine);
+		x = x + 1;
+		x = int(x);
+	}
+}
+
+drawBoard();
+
+while (true) {
+	print("you have", attempts, "attempts left");
+	getInputs();
+	drawBoard();
+
+	// i flipped it so it may look wrong but its correct
+	if (playerY == goalPosX and playerX == goalPosY) {
+		print("you have won the game!");
+		return;
+	}
+
+	if (attempts == 0) {
+		print("you have ran out of attempts!, you have lost the game.");
+		return;
+	}
+}
 ```
 
 
